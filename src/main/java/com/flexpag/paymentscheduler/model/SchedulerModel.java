@@ -1,10 +1,7 @@
 package com.flexpag.paymentscheduler.model;
 
-import jdk.jshell.Snippet;
-
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Entity
@@ -19,9 +16,9 @@ public class SchedulerModel {
     @Column(name = "dataVencimento", nullable = false)
     private LocalDate dataVencimento;
     @Column(name = "dataAgendamento", nullable = false)
-    private LocalDate dataAgendamento;
+    private LocalDate dataAgendamento = LocalDate.now();
     @Column(name = "horaAgendamento", nullable = false)
-    private LocalTime horaAgendamento;
+    private LocalTime horaAgendamento = LocalTime.now();
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private StatusPagamento status = StatusPagamento.PENDING;
@@ -60,7 +57,7 @@ public class SchedulerModel {
     }
 
     public void setDataAgendamento(LocalDate dataAgendamento) {
-        this.dataAgendamento = dataAgendamento;
+        this.dataAgendamento = LocalDate.from(dataAgendamento);
     }
 
     public StatusPagamento getStatus() {

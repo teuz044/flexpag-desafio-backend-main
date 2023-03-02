@@ -1,11 +1,15 @@
 package com.flexpag.paymentscheduler.service;
 
+import com.flexpag.paymentscheduler.handler.AgendamentoNaoEncontradoException;
+import com.flexpag.paymentscheduler.handler.PagamentoRealizadoException;
 import com.flexpag.paymentscheduler.model.SchedulerModel;
 import com.flexpag.paymentscheduler.model.StatusPagamento;
 import com.flexpag.paymentscheduler.repository.SchedulerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -32,22 +36,33 @@ public class SchedulerService {
     public boolean pagarAgendamento(Integer id) {
         SchedulerModel scheduler = repository.findById(id).orElse(null);
         if (scheduler == null) {
-            return false;
+            throw new AgendamentoNaoEncontradoException();
+        }
+        if (scheduler.getStatus() == StatusPagamento.PAID) {
+            throw new PagamentoRealizadoException();
         }
         scheduler.setStatus(StatusPagamento.PAID);
         repository.save(scheduler);
         return true;
     }
-
-    public LocalDateTime atualizarDataHora(LocalDateTime dataHora, Integer id) {
-        SchedulerModel scheduler = repository.findById(id).orElse(null);
-        if (scheduler.getStatus() == StatusPagamento.PAID) {
-            return null;
+    public void atualizarDataVencimento(Integer id, LocalDate novaDataVencimento) throws PagamentoRealizadoException, AgendamentoNaoEncontradoException {
+        Optional<SchedulerModel> schedulerOptional = repository.findById(id);
+        if (schedulerOptional.isPresent()) {
+            SchedulerModel scheduler = schedulerOptional.get();
+            if (scheduler.getStatus() == StatusPagamento.PAID) {
+                throw new PagamentoRealizadoException();
+            } else {
+                scheduler.setDataVencimento(novaDataVencimento);
+                repository.save(scheduler);
+            }
+        } else {
+            throw new AgendamentoNaoEncontradoException();
         }
-        scheduler.setDataAgendamento(dataHora.toLocalDate());
-        scheduler.setHoraAgendamento(dataHora.toLocalTime());
-        repository.save(scheduler);
-        return scheduler.getDataAgendamento().atTime(scheduler.getHoraAgendamento());
     }
+
+
+
+
+
 
 }
