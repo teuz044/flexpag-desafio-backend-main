@@ -1,12 +1,12 @@
 package com.flexpag.paymentscheduler.service;
 
 import com.flexpag.paymentscheduler.model.SchedulerModel;
+import com.flexpag.paymentscheduler.model.StatusPagamento;
 import com.flexpag.paymentscheduler.repository.SchedulerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 
-import java.util.List;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -19,13 +19,35 @@ public class SchedulerService {
         if (optionalAgendamento.isPresent()) {
             return optionalAgendamento.get();
         } else {
-            // caso não seja encontrado nenhum agendamento com o ID informado
             return null;
         }
     }
-    public SchedulerModel agendarPagamento (SchedulerModel schedulerModel) {
+
+    public Integer agendarPagamento(SchedulerModel schedulerModel) {
         SchedulerModel newScheduler = repository.save(schedulerModel);
-        return newScheduler;
+        newScheduler.setStatus(StatusPagamento.PENDING);
+        return newScheduler.getId();
+    }
+
+    public boolean pagarAgendamento(Integer id) {
+        SchedulerModel scheduler = repository.findById(id).orElse(null);
+        if (scheduler == null) {
+            return false;
+        }
+        scheduler.setStatus(StatusPagamento.PAID);
+        repository.save(scheduler);
+        return true;
+    }
+
+    public LocalDateTime atualizarDataHora(LocalDateTime dataHora, Integer id) {
+        SchedulerModel scheduler = repository.findById(id).orElse(null);
+        if (scheduler.getStatus() == StatusPagamento.PAID) {
+            return null;
+        }
+        scheduler.setDataAgendamento(dataHora.toLocalDate());
+        scheduler.setHoraAgendamento(dataHora.toLocalTime());
+        repository.save(scheduler);
+        return scheduler.getDataAgendamento().atTime(scheduler.getHoraAgendamento());
     }
 
 }

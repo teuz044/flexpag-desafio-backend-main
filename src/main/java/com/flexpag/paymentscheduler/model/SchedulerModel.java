@@ -1,11 +1,14 @@
 package com.flexpag.paymentscheduler.model;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import java.time.LocalDate;
+import jdk.jshell.Snippet;
 
+import javax.persistence.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
+@Entity
+@Table(name = "scheduler")
 public class SchedulerModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
@@ -17,23 +20,33 @@ public class SchedulerModel {
     private LocalDate dataVencimento;
     @Column(name = "dataAgendamento", nullable = false)
     private LocalDate dataAgendamento;
-    @Column(name = "status", nullable = false)
-    private String status;
+    @Column(name = "horaAgendamento", nullable = false)
+    private LocalTime horaAgendamento;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private StatusPagamento status = StatusPagamento.PENDING;
     @Column(name = "beneficiario", nullable = false)
     private String beneficiario;
 
-    public SchedulerModel getId() {
+    public SchedulerModel() {
+    }
+
+    public Integer getId() {
         return id;
     }
+
     public void setId(Integer id) {
         this.id = id;
     }
+
     public Long getValorPagamento() {
         return valorPagamento;
     }
+
     public void setValorPagamento(Long valorPagamento) {
         this.valorPagamento = valorPagamento;
     }
+
     public LocalDate getDataVencimento() {
         return dataVencimento;
     }
@@ -50,12 +63,20 @@ public class SchedulerModel {
         this.dataAgendamento = dataAgendamento;
     }
 
-    public String getStatus() {
+    public StatusPagamento getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(StatusPagamento status) {
         this.status = status;
+    }
+
+    public LocalTime getHoraAgendamento() {
+        return horaAgendamento;
+    }
+
+    public void setHoraAgendamento(LocalTime horaAgendamento) {
+        this.horaAgendamento = horaAgendamento;
     }
 
     public String getBeneficiario() {
