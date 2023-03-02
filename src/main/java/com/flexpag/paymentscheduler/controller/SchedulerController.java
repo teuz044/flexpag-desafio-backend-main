@@ -60,5 +60,20 @@ public class SchedulerController {
         } catch (AgendamentoNaoEncontradoException ex) {
             return new ResponseEntity<>("Agendamento não encontrado.", HttpStatus.NOT_FOUND);
         }
+
     }
+
+    @DeleteMapping("/deletar/{id}")
+    public ResponseEntity<String> deletarAgendamento(@PathVariable Integer id) {
+        try {
+            schedulerService.deletarAgendamento(id);
+            return new ResponseEntity<>("Agendamento excluido", HttpStatus.OK);
+        }
+        catch (PagamentoRealizadoException ex) {
+            return new ResponseEntity<>("Pagamento já realizado, você não pode excluir.", HttpStatus.UNAUTHORIZED);
+        } catch (AgendamentoNaoEncontradoException ex) {
+            return new ResponseEntity<>("Agendamento não encontrado", HttpStatus.BAD_REQUEST);
+        }
+    }
+
 }

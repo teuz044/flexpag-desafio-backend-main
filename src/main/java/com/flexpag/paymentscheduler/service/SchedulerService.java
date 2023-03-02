@@ -60,9 +60,19 @@ public class SchedulerService {
         }
     }
 
+    public void deletarAgendamento(Integer id) throws PagamentoRealizadoException, AgendamentoNaoEncontradoException {
+        Optional<SchedulerModel> schedulerOptional = repository.findById(id);
 
+        if (schedulerOptional.isPresent()) {
+            SchedulerModel scheduler = schedulerOptional.get();
+            if (scheduler.getStatus() == StatusPagamento.PAID) {
+                throw new PagamentoRealizadoException();
+            } else if (scheduler.getStatus() == StatusPagamento.PENDING){
+                repository.delete(scheduler);
+            }
+        } else {
+            throw new AgendamentoNaoEncontradoException();
+        }
 
-
-
-
+    }
 }
