@@ -3,6 +3,7 @@ package com.flexpag.paymentscheduler.model;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "scheduler")

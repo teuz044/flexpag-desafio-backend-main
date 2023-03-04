@@ -12,27 +12,26 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = "*")
 @RequestMapping("/scheduler")
 public class SchedulerController {
-    private SchedulerService schedulerService;
+    private final SchedulerService schedulerService;
 
-    public SchedulerController (SchedulerService schedulerService) {
+    public SchedulerController(SchedulerService schedulerService) {
         this.schedulerService = schedulerService;
-
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<SchedulerModel> listarAagamentosPorId(@PathVariable Integer id) {
+    public ResponseEntity<SchedulerModel> listarAgendamentoPorId(@PathVariable Integer id) {
         SchedulerModel agendamento = schedulerService.listarAgendamentoPorId(id);
-        if (agendamento != null) {
-            return ResponseEntity.status(200).body(agendamento);
-        } else {
+        if (agendamento == null) {
             return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(agendamento);
         }
     }
 
     @PostMapping("/agendar")
     public ResponseEntity<String> agendarPagamento(@RequestBody SchedulerModel schedulerModel) {
         Integer agendamentoId = schedulerService.agendarPagamento(schedulerModel);
-        return ResponseEntity.status(HttpStatus.CREATED).body("O id do seu agendamento é: " +schedulerModel.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body("O id do seu agendamento é: " + agendamentoId);
     }
 
     @PostMapping("/pagar/{id}")
@@ -40,40 +39,37 @@ public class SchedulerController {
         try {
             boolean sucesso = schedulerService.pagarAgendamento(id);
             if (sucesso) {
-                return new ResponseEntity<>("Pagamento efetuado com sucesso", HttpStatus.OK);
+                return ResponseEntity.ok("Pagamento efetuado com sucesso");
             }
         } catch (PagamentoRealizadoException ex) {
-            return new ResponseEntity<>("Pagamento já realizado", HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest().body("Pagamento já realizado");
         } catch (AgendamentoNaoEncontradoException ex) {
-            return new ResponseEntity<>("O agendamento não encontrado.", HttpStatus.NOT_FOUND);
+            return ResponseEntity.notFound().build();
         }
         return ResponseEntity.notFound().build();
     }
 
     @PutMapping("/atualizar/{id}/datavencimento")
-    public ResponseEntity<String> atualizarDataVencimento(@PathVariable Integer id, @RequestBody SchedulerModel schedulerAtualizado) {
+    public ResponseEntity<String> atualizarDataVencimento(@PathVariable Integer id, @RequestBody SchedulerModel schedulerModel) {
         try {
-            schedulerService.atualizarDataVencimento(id, schedulerAtualizado.getDataVencimento());
-            return new ResponseEntity<>("Data de vencimento do agendamento atualizada com sucesso.", HttpStatus.OK);
+            schedulerService.atualizarDataVencimento(id, schedulerModel.getDataVencimento());
+            return ResponseEntity.ok("Data de vencimento do agendamento atualizada com sucesso.");
         } catch (PagamentoRealizadoException ex) {
-            return new ResponseEntity<>("O agendamento já foi pago.", HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest().body("O agendamento já foi pago.");
         } catch (AgendamentoNaoEncontradoException ex) {
-            return new ResponseEntity<>("Agendamento não encontrado.", HttpStatus.NOT_FOUND);
+            return ResponseEntity.notFound().build();
         }
-
     }
 
     @DeleteMapping("/deletar/{id}")
     public ResponseEntity<String> deletarAgendamento(@PathVariable Integer id) {
         try {
             schedulerService.deletarAgendamento(id);
-            return new ResponseEntity<>("Agendamento excluido", HttpStatus.OK);
-        }
-        catch (PagamentoRealizadoException ex) {
-            return new ResponseEntity<>("Pagamento já realizado, você não pode excluir.", HttpStatus.UNAUTHORIZED);
+            return ResponseEntity.ok("Agendamento excluido");
+        } catch (PagamentoRealizadoException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Pagamento já realizado, você não pode excluir.");
         } catch (AgendamentoNaoEncontradoException ex) {
-            return new ResponseEntity<>("Agendamento não encontrado", HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest().body("Agendamento não encontrado");
         }
     }
-
 }
