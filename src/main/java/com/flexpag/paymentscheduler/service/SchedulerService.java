@@ -3,14 +3,12 @@ package com.flexpag.paymentscheduler.service;
 import com.flexpag.paymentscheduler.handler.AgendamentoNaoEncontradoException;
 import com.flexpag.paymentscheduler.handler.PagamentoRealizadoException;
 import com.flexpag.paymentscheduler.model.SchedulerModel;
-import com.flexpag.paymentscheduler.model.StatusPagamento;
+import com.flexpag.paymentscheduler.enums.StatusPagamento;
 import com.flexpag.paymentscheduler.repository.SchedulerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service

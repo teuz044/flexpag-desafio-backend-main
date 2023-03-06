@@ -3,7 +3,7 @@ package com.flexpag.paymentscheduler.serviceTest;
 import com.flexpag.paymentscheduler.handler.AgendamentoNaoEncontradoException;
 import com.flexpag.paymentscheduler.handler.PagamentoRealizadoException;
 import com.flexpag.paymentscheduler.model.SchedulerModel;
-import com.flexpag.paymentscheduler.model.StatusPagamento;
+import com.flexpag.paymentscheduler.enums.StatusPagamento;
 import com.flexpag.paymentscheduler.repository.SchedulerRepository;
 import com.flexpag.paymentscheduler.service.SchedulerService;
 import org.junit.jupiter.api.Test;

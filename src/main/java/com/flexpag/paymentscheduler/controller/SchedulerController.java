@@ -1,5 +1,6 @@
 package com.flexpag.paymentscheduler.controller;
 
+import com.flexpag.paymentscheduler.dto.SchedulerDtoPost;
 import com.flexpag.paymentscheduler.handler.AgendamentoNaoEncontradoException;
 import com.flexpag.paymentscheduler.handler.PagamentoRealizadoException;
 import com.flexpag.paymentscheduler.model.SchedulerModel;
@@ -30,11 +31,11 @@ public class SchedulerController {
     }
 
     @PostMapping("/agendar")
-    public ResponseEntity<String> agendarPagamento(@ApiParam("Dados do agendamento") @RequestBody SchedulerModel schedulerModel) {
+    public ResponseEntity<String> agendarPagamento(@ApiParam("Dados do agendamento") @RequestBody SchedulerDtoPost schedulerDTO) {
+        SchedulerModel schedulerModel = schedulerDTO.toModel();
         Integer agendamentoId = schedulerService.agendarPagamento(schedulerModel);
         return ResponseEntity.status(HttpStatus.CREATED).body("O id do seu agendamento é: " + agendamentoId);
     }
-
     @PostMapping("/pagar/{id}")
     public ResponseEntity<String> pagarAgendamento(@ApiParam("ID do agendamento") @PathVariable Integer id) {
         try {
